@@ -33,10 +33,8 @@ class LoginViewController: UIViewController {
     @IBAction func loginViaWebsiteTapped() {
 //        performSegue(withIdentifier: "completeLogin", sender: nil)
         TMDBClient.getRequestToken { (success, error) in
-            DispatchQueue.main.async {
-                if success {
-                    UIApplication.shared.open(TMDBClient.Endpoints.webAuth.url, options: [:], completionHandler: nil)
-                }
+            if success {
+                UIApplication.shared.open(TMDBClient.Endpoints.webAuth.url, options: [:], completionHandler: nil)
             }
         }
     }
@@ -49,9 +47,7 @@ class LoginViewController: UIViewController {
     func handleRequestTokenResponse(success: Bool, error: Error?) {
         if success {
             print(TMDBClient.Auth.requestToken)
-            DispatchQueue.main.async {
-                TMDBClient.login(username: self.emailTextField.text ?? "", password: self.passwordTextField.text ?? "", completion: self.handleLoginResponse(success:error:))
-            }
+            TMDBClient.login(username: self.emailTextField.text ?? "", password: self.passwordTextField.text ?? "", completion: self.handleLoginResponse(success:error:))
         } else {
             print("Not Successful!")
         }
@@ -81,5 +77,3 @@ class LoginViewController: UIViewController {
     
     
 }
-
-

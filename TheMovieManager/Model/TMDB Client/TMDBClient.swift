@@ -52,40 +52,53 @@ class TMDBClient {
     }
     
     
-    class func getWatchlist(completion: @escaping ([Movie], Error?) -> Void) {
-        let task = URLSession.shared.dataTask(with: Endpoints.getWatchList.url) { (data, response, error) in
+    class func taskForGETRequest<ResponseType: Decodable>(url: URL, response: ResponseType.Type, completion: @escaping (ResponseType?, Error?) -> Void) {
+        
+        let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
             guard let data = data else {
-                completion([], error)
+                DispatchQueue.main.async {
+                    completion(nil, error)
+                }
                 return
             }
             let decoder = JSONDecoder()
             do {
-                let responseObject = try decoder.decode(MovieResults.self, from: data)
-                completion(responseObject.results, nil)
+                let responseObject = try decoder.decode(ResponseType.self, from: data)
+                DispatchQueue.main.async {
+                    completion(responseObject, nil)
+                }
             } catch {
-                completion([], error)
+                DispatchQueue.main.async {
+                    completion(nil, error)
+                }
             }
         }
         task.resume()
     }
     
     
-    class func getRequestToken(completion: @escaping (Bool, Error?) -> Void) {
-        let task = URLSession.shared.dataTask(with: Endpoints.getRequestToken.url) { (data, response, error) in
-            guard let data = data else {
-                completion(false, error)
-                return
+    class func getWatchlist(completion: @escaping ([Movie], Error?) -> Void) {
+
+        taskForGETRequest(url: Endpoints.getWatchList.url, response: MovieResults.self) { (response, error) in
+            if let response = response {
+                completion(response.results, nil)
+            } else {
+                completion([], error)
             }
-            let decoder = JSONDecoder()
-            do {
-                let responseObject = try decoder.decode(RequestTokenResponse.self, from: data)
-                Auth.requestToken = responseObject.requestToken
+        }
+    }
+    
+    
+    class func getRequestToken(completion: @escaping (Bool, Error?) -> Void) {
+        
+        taskForGETRequest(url: Endpoints.getRequestToken.url, response: RequestTokenResponse.self) { (response, error) in
+            if let response = response {
+                Auth.requestToken = response.requestToken
                 completion(true, nil)
-            } catch {
+            } else {
                 completion(false, error)
             }
         }
-        task.resume()
     }
     
     
