@@ -16,6 +16,11 @@ class FavoritesViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        TMDBClient.getFavoriteList { (movies, error) in
+            MovieModel.favorites = movies
+            self.tableView.reloadData()
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -34,7 +39,8 @@ class FavoritesViewController: UIViewController {
 }
 
 
-extension FavoritesViewController: UITableViewDataSource, UITableViewDelegate {
+
+extension FavoritesViewController: UITableViewDelegate, UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
@@ -59,5 +65,4 @@ extension FavoritesViewController: UITableViewDataSource, UITableViewDelegate {
         performSegue(withIdentifier: "showDetail", sender: nil)
         tableView.deselectRow(at: indexPath, animated: true)
     }
-    
 }
