@@ -28,10 +28,14 @@ class SearchViewController: UIViewController {
 }
 
 
+
 extension SearchViewController: UISearchBarDelegate {
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        
+        TMDBClient.search(query: searchText) { (movieResults, error) in
+            self.movies = movieResults
+            self.tableView.reloadData()
+        }
     }
     
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
@@ -46,6 +50,8 @@ extension SearchViewController: UISearchBarDelegate {
         searchBar.endEditing(true)
     }
 }
+
+
 
 
 extension SearchViewController: UITableViewDataSource, UITableViewDelegate {

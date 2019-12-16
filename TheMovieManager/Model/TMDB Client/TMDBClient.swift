@@ -29,6 +29,7 @@ class TMDBClient {
         case createSessionId
         case webAuth
         case logout
+        case search(String)
         
         var stringValue: String {
             switch self {
@@ -46,6 +47,8 @@ class TMDBClient {
                 return "https://www.themoviedb.org/authenticate/" + Auth.requestToken + "?redirect_to=themoviemanager:authentication"
             case .logout:
                 return Endpoints.base + "/authentication/session" + Endpoints.apiKeyParam
+            case .search(let query):
+                return Endpoints.base + "/search/movie" + Endpoints.apiKeyParam + "&query=\(query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")"
             }
         }
         
@@ -116,6 +119,19 @@ class TMDBClient {
         }
     }
     
+    
+    
+    
+    class func search(query: String, completion: @escaping ([Movie], Error?) -> Void) {
+        let url = Endpoints.search(query).url
+        taskForGETRequest(url: url, response: MovieResults.self) { (response, error) in
+            if let response = response {
+                completion(response.results, nil)
+            } else {
+                completion([], error)
+            }
+        }
+    }
     
     
     
