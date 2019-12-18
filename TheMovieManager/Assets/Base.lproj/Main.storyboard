@@ -280,7 +280,7 @@
                                     </barButtonItem>
                                     <barButtonItem title="Item" image="Favorite" id="hMm-5H-1Df">
                                         <connections>
-                                            <action selector="favoriteButtonTapped:" destination="bMS-kJ-dg1" id="iMs-7M-Goo"/>
+                                            <action selector="favoriteButtonTapped:" destination="bMS-kJ-dg1" id="NrI-F1-hJk"/>
                                         </connections>
                                     </barButtonItem>
                                 </items>
