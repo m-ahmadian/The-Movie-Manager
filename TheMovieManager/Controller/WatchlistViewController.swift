@@ -23,6 +23,7 @@ class WatchlistViewController: UIViewController {
                 self.tableView.reloadData()
             }
         }
+        tableView.reloadData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -57,6 +58,17 @@ extension WatchlistViewController: UITableViewDataSource, UITableViewDelegate {
         let movie = MovieModel.watchlist[indexPath.row]
         
         cell.textLabel?.text = movie.title
+        
+        if let posterPath = movie.posterPath {
+            TMDBClient.downloadPosterImage(posterPath: posterPath) { (data, error) in
+                guard let data = data else {
+                    return
+                }
+                let downloadedImage = UIImage(data: data)
+                cell.imageView?.image = downloadedImage
+                cell.setNeedsLayout()
+            }
+        }
         
         return cell
     }

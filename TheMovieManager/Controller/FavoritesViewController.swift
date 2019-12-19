@@ -21,6 +21,7 @@ class FavoritesViewController: UIViewController {
             MovieModel.favorites = movies
             self.tableView.reloadData()
         }
+        tableView.reloadData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -56,6 +57,17 @@ extension FavoritesViewController: UITableViewDelegate, UITableViewDataSource {
         let movie = MovieModel.favorites[indexPath.row]
         
         cell.textLabel?.text = movie.title
+        
+        if let posterPath = movie.posterPath {
+            TMDBClient.downloadPosterImage(posterPath: posterPath) { (data, error) in
+                guard let data = data else {
+                    return
+                }
+                let downloadedImage = UIImage(data: data)
+                cell.imageView?.image = downloadedImage
+                cell.setNeedsLayout()
+            }
+        }
         
         return cell
     }
