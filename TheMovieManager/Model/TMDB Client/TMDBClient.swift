@@ -67,7 +67,7 @@ class TMDBClient {
     }
     
     
-    class func taskForGETRequest<ResponseType: Decodable>(url: URL, response: ResponseType.Type, completion: @escaping (ResponseType?, Error?) -> Void) {
+    @discardableResult class func taskForGETRequest<ResponseType: Decodable>(url: URL, response: ResponseType.Type, completion: @escaping (ResponseType?, Error?) -> Void) -> URLSessionTask {
         
         let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
             guard let data = data else {
@@ -89,6 +89,7 @@ class TMDBClient {
             }
         }
         task.resume()
+        return task
     }
     
     
@@ -131,15 +132,16 @@ class TMDBClient {
     
     
     
-    class func search(query: String, completion: @escaping ([Movie], Error?) -> Void) {
+    class func search(query: String, completion: @escaping ([Movie], Error?) -> Void) -> URLSessionTask {
         let url = Endpoints.search(query).url
-        taskForGETRequest(url: url, response: MovieResults.self) { (response, error) in
+        let task = taskForGETRequest(url: url, response: MovieResults.self) { (response, error) in
             if let response = response {
                 completion(response.results, nil)
             } else {
                 completion([], error)
             }
         }
+        return task
     }
     
     
@@ -152,7 +154,7 @@ class TMDBClient {
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try! JSONEncoder().encode(body)
         
-        let task = URLSession.shared.dataTask(with: request) { (data, respnse, error) in
+        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
             guard let data = data else {
                 DispatchQueue.main.async {
                     completion(nil, error)
